@@ -118,9 +118,6 @@ def print_table(data):
 current_dir = os.path.dirname(os.path.abspath(__file__))
 pdf_folder = os.path.join(current_dir, "media")  # Path to the folder containing PDF files
 
-# Initialize site totals dictionary to hold total amounts for each site
-site_totals = {site: 0 for site in site_names}
-
 # Iterate through PDF files in the folder
 for filename in os.listdir(pdf_folder):
     if filename.endswith(".pdf"):
@@ -133,18 +130,35 @@ for filename in os.listdir(pdf_folder):
         # Extract numbers following '£' symbol from text
         numbers = extract_numbers_from_text(pdf_text)
 
-        # Update site totals for each site
+        # Combine site names and numbers into rows for the table
+        table_data = [("Site Name", "Price (£)")]
+        site_totals = {site: 0 for site in site_names}  # Initialize site totals dictionary
+
         for site_name, price in zip(matched_site_names, numbers):
             price_float = float(price)  # Convert price string to float
             site_totals[site_name] += price_float  # Update site total
+            table_data.append((site_name, "£" + price))
 
-# Print the totals table
-totals_data = [("Site Name", "Total (£)")]
-grand_total = 0
-for site_name, total in site_totals.items():
-    totals_data.append((site_name, "£{:.2f}".format(total)))
-    grand_total += total
+        # Print the invoice number
+        invoice_number = extract_invoice_number(pdf_text)
+        if invoice_number:
+            print("Invoice/Receipt Number:", invoice_number)
+            print()
 
-print("Totals:")
-print_table(totals_data)
-print("\nGrand Total: £{:.2f}".format(grand_total))
+        # Print the individual site prices table
+        print("Individual Site Prices:")
+        print_table(table_data)
+
+        # Print the totals table
+        totals_data = [("Site Name", "Total (£)")]
+        for site_name, total in site_totals.items():
+            totals_data.append((site_name, "£{:.2f}".format(total)))
+
+        print("\nTotals:")
+        print_table(totals_data)
+
+        # Calculate total
+        total = sum(float(num) for num in numbers)
+        print("Invoice Total:", "£" + str(total))
+
+        print("\n\n")
