@@ -116,7 +116,7 @@ def print_table(data):
 
 # Get the directory of the current script
 current_dir = os.path.dirname(os.path.abspath(__file__))
-pdf_folder = os.path.join(current_dir, "media")  # Path to the folder containing PDF files
+pdf_folder = os.path.join(current_dir, "uploads")  # Path to the folder containing PDF files
 
 # Iterate through PDF files in the folder
 for filename in os.listdir(pdf_folder):
@@ -142,19 +142,20 @@ for filename in os.listdir(pdf_folder):
         # Print the invoice number
         invoice_number = extract_invoice_number(pdf_text)
         if invoice_number:
-            print("Invoice/Receipt Number:", invoice_number)
-            print()
+            print("\nInvoice/Receipt Number:\n", invoice_number)
+            print("--")
 
         # Print the individual site prices table
-        print("Individual Site Prices:")
-        print_table(table_data)
+        # print("Individual Site Prices:")
+        # print_table(table_data)
 
         # Print the totals table
         totals_data = [("Site Name", "Total (£)")]
         for site_name, total in site_totals.items():
             totals_data.append((site_name, "£{:.2f}".format(total)))
 
-        print("\nTotals:")
+        print("\nTotals Site Prices:")
+
         print_table(totals_data)
 
         # Calculate total
