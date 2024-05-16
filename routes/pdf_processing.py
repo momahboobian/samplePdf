@@ -7,7 +7,6 @@ from utils.invoice_number import extract_invoice_number
 from utils.site_names import extract_site_names, site_names
 from utils.site_numbers import extract_site_numbers
 from utils.totals_calculator import calculate_totals_for_file
-from utils.folder_utils import is_upload_folder_empty
 
 UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
 

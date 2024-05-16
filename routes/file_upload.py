@@ -14,11 +14,11 @@ def upload_file():
     if 'files[]' not in request.files:
         return jsonify({'error': 'No files uploaded'}), 400
 
-    files = request.files.getlist('files[]')
-
-    if is_upload_folder_empty():
+    if not is_upload_folder_empty():
         return jsonify({'error': 'Upload folder is not empty. Do you want to empty it?'}), 409
 
+    files = request.files.getlist('files[]')
+    
     for file in files:
         if file and file.filename.endswith('.pdf'):
             if not os.path.exists(UPLOAD_FOLDER):

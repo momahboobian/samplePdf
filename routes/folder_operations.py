@@ -4,10 +4,10 @@ import shutil
 
 UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
 
-def is_folder_empty():
-    return not os.path.isdir(UPLOAD_FOLDER)
+def is_upload_folder_empty():
+    return {'folder_empty': not os.path.isdir(UPLOAD_FOLDER)}
 
-def empty_folder():
+def empty_upload_folder():
     for filename in os.listdir(UPLOAD_FOLDER):
         file_path = os.path.join(UPLOAD_FOLDER, filename)
         if os.path.isfile(file_path):

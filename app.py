@@ -4,7 +4,7 @@ import logging
 
 from routes.file_upload import upload_file
 from routes.pdf_processing import perform_action
-from routes.folder_operations import is_folder_empty, empty_folder
+from routes.folder_operations import is_upload_folder_empty, empty_upload_folder
 from config import LOG_LEVEL
 
 app = Flask(__name__)
@@ -21,17 +21,17 @@ def index():
 def handle_file_upload():
     return upload_file()
 
-@app.route('/totals')
+@app.route('/totals', methods=['POST'])
 def process_pdf():
     return perform_action()
 
 @app.route('/empty', methods=['POST'])
-def empty_upload_folder():
-    return empty_folder()
+def empty_upload_folder_route():
+    return empty_upload_folder()
 
 @app.route('/check-folder', methods=['GET'])
 def check_upload_folder():
-    return is_folder_empty()
+    return is_upload_folder_empty()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
