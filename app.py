@@ -2,13 +2,14 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 import time
-import shutil
 import logging
 
 from utils.pdf_to_text import extract_text_from_pdf 
 from utils.invoice_number import extract_invoice_number
 from utils.site_names import extract_site_names, site_names
 from utils.site_numbers import extract_site_numbers
+from utils.folder_utils import is_upload_folder_empty, empty_upload_folder
+from utils.totals_calculator import calculate_totals_for_file
 
 app = Flask(__name__)
 CORS(app)
@@ -17,55 +18,6 @@ UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
-
-def calculate_totals_for_file(file_path):
-    """
-    Calculate total number of pages of a PDF file.
-
-    Args:
-        file_path (str): Path to the PDF file.
-
-    Returns:
-        dist: Dictionary containing calculated results.
-    """
-    try:
-        pdf_text = extract_text_from_pdf(file_path)
-        matched_site_names = extract_site_names(file_path)
-        numbers = extract_site_numbers(pdf_text)
-        invoice_number = extract_invoice_number(pdf_text)
-
-
-        if len(matched_site_names) != len(numbers):
-            return jsonify({'error': 'Number of site names and numbers do not match'}), 400
-
-        site_totals = {site: 0.0 for site in site_names}
-        for site_name, price in zip(matched_site_names, numbers):
-            price_float = float(price.replace('£', ''))
-            site_totals[site_name] += price_float
-
-        totals_data = [(site_name, "{:.2f}".format(total)) for site_name, total in site_totals.items()]
-        grand_total = sum(site_totals.values())
-
-    except Exception as e:
-        logging.error(f"Error calculating totals: {e}")
-
-    return {
-        'invoice_number': invoice_number,
-        'calculation_results': [{'site': site_name, 'total': total} for site_name, total in totals_data],
-        'grand_total': "{:.2f}".format(grand_total),
-        'totals': totals_data
-    }
-
-def is_upload_folder_empty():
-    return not os.path.isdir(UPLOAD_FOLDER)
-
-def empty_upload_folder():
-    for filename in os.listdir(UPLOAD_FOLDER):
-        file_path = os.path.join(UPLOAD_FOLDER, filename)
-        if os.path.isfile(file_path):
-            os.remove(file_path)
-        elif os.path.isdir(file_path):
-            shutil.rmtree(file_path)
 
 @app.route('/')
 def index():
@@ -106,12 +58,17 @@ def perform_action():
         if file_name.endswith('.pdf'):
             file_path = os.path.join(uploads_folder, file_name)
             try:
-                calculation_results = calculate_totals_for_file(file_path)
+                pdf_text = extract_text_from_pdf(file_path)
+                matched_site_names = extract_site_names(file_path)
+                numbers = extract_site_numbers(pdf_text)
+                invoice_number = extract_invoice_number(pdf_text)
+                
+                calculation_results = calculate_totals_for_file(pdf_text, matched_site_names, numbers, invoice_number, site_names)
                 if 'error' in calculation_results:
                     return jsonify(calculation_results), 400
                 calculation_results_all_files.append(calculation_results)
             except Exception as e:
-                print(f"Error processing file {file_name}: {str(e)}")
+                logging.error(f"Error processing file {file_name}: {str(e)}")
 
     if not calculation_results_all_files:
         return jsonify({'error': 'No PDF files found or error processing files'}), 400
@@ -125,7 +82,7 @@ def perform_action():
             grand_totals[site_name] += float(total)
 
     overall_grand_total = sum(grand_totals.values())
-    print(f"Overall Grand Total: £{overall_grand_total:.2f}\n\n")
+    logging.info(f"Overall Grand Total: £{overall_grand_total:.2f}\n\n")
 
     def format_decimal_places(value):
         return "{:.2f}".format(value)
@@ -133,7 +90,6 @@ def perform_action():
     for result in calculation_results_all_files:
         del result['totals']
 
-    # Modify the response data to format the numbers
     response_data = [{
         'calculation_results': calculation_results_all_files,
         'grand_totals': {site: format_decimal_places(total) for site, total in grand_totals.items()},
