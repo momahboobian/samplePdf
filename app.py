@@ -2,10 +2,10 @@ from flask import Flask
 from flask_cors import CORS
 import logging
 
+from config import LOG_LEVEL
 from routes.file_upload import upload_file
 from routes.pdf_processing import perform_action
 from routes.folder_operations import is_upload_folder_empty, empty_upload_folder
-from config import LOG_LEVEL
 
 app = Flask(__name__)
 CORS(app)
@@ -21,7 +21,7 @@ def index():
 def handle_file_upload():
     return upload_file()
 
-@app.route('/totals', methods=['POST'])
+@app.route('/totals')
 def process_pdf():
     return perform_action()
 
