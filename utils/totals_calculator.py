@@ -28,7 +28,7 @@ def calculate_totals_for_file(pdf_text, matched_site_names, numbers, invoice_num
 
         return {
             'invoice_number': invoice_number,
-            'calculation_results': [{'site': site_name, 'total': total} for site_name, total in totals_data],
+            'sites_total_results': [{'site': site_name, 'total': total} for site_name, total in totals_data],
             'grand_total': "{:.2f}".format(grand_total),
             'totals': totals_data
         }
