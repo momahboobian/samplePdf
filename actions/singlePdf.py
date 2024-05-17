@@ -26,6 +26,7 @@ site_names = {
     "St Patricks Day": "St Patricks Day",
 }
 
+
 def extract_invoice_number(text):
     """
     Extract invoice number from text.
@@ -43,6 +44,7 @@ def extract_invoice_number(text):
     else:
         return None
 
+
 def extract_site_names_from_pdf(pdf_path):
     """
     Extract site names from PDF text.
@@ -59,11 +61,12 @@ def extract_site_names_from_pdf(pdf_path):
         for page in reader.pages:
             lines = page.extract_text().split('\n')
             for line in lines:
-                if line.startswith("Boom") or line.startswith("Post"):
+                if line.startswith("Boom"):
                     for site_name_key, site_name_value in site_names.items():
                         if site_name_value in line:
                             matched_site_names.append(site_name_key)
     return matched_site_names
+
 
 def extract_numbers_from_text(text):
     """
@@ -78,6 +81,7 @@ def extract_numbers_from_text(text):
     pattern = r'From.*?£(\d+\.\d{2})'  # Updated regex pattern
     matches = re.findall(pattern, text)
     return matches
+
 
 def extract_text_from_pdf(pdf_path):
     """
@@ -95,6 +99,7 @@ def extract_text_from_pdf(pdf_path):
         for page in reader.pages:
             text += page.extract_text()
     return text
+
 
 def print_table(data):
     """
@@ -116,56 +121,42 @@ def print_table(data):
 
 # Get the directory of the current script
 current_dir = os.path.dirname(os.path.abspath(__file__))
-pdf_folder = os.path.join(current_dir, "media")  # Path to the folder containing PDF files
+pdf_sample_path = os.path.join(current_dir, "media/sample.pdf")
+pdf_text = extract_text_from_pdf(pdf_sample_path)
 
-# Iterate through PDF files in the folder
-for filename in os.listdir(pdf_folder):
-    if filename.endswith(".pdf"):
-        pdf_path = os.path.join(pdf_folder, filename)
-        pdf_text = extract_text_from_pdf(pdf_path)
+# Extract site names from the PDF
+matched_site_names = extract_site_names_from_pdf(pdf_sample_path)
 
-        # Extract site names from the PDF
-        matched_site_names = extract_site_names_from_pdf(pdf_path)
+# Extract numbers following '£' symbol from text
+numbers = extract_numbers_from_text(pdf_text)
 
-        # Extract numbers following '£' symbol from text
-        numbers = extract_numbers_from_text(pdf_text)
+# Combine site names and numbers into rows for the table
+table_data = [("Site Name", "Price (£)")]
+site_totals = {site: 0 for site in site_names}  # Initialize site totals dictionary
 
-        # Combine site names and numbers into rows for the table
-        table_data = [("Site Name", "Price (£)")]
-        site_totals = {site: 0 for site in site_names}  # Initialize site totals dictionary
+for site_name, price in zip(matched_site_names, numbers):
+    price_float = float(price)  # Convert price string to float
+    site_totals[site_name] += price_float  # Update site total
+    table_data.append((site_name, "£" + price))
 
-        for site_name, price in zip(matched_site_names, numbers):
-            price_float = float(price)  # Convert price string to float
-            site_totals[site_name] += price_float  # Update site total
-            table_data.append((site_name, "£" + price))
+# Print the invoice number
+invoice_number = extract_invoice_number(pdf_text)
+if invoice_number:
+    print("Invoice/Receipt Number:", invoice_number)
+    print()
 
-        # Print the invoice number
-        invoice_number = extract_invoice_number(pdf_text)
-        if invoice_number:
-            print("\nInvoice/Receipt Number:\n", invoice_number)
-            print("--")
+# Print the individual site prices table
+print("Individual Site Prices:")
+print_table(table_data)
 
-        # Print the individual site prices table
-        print("Individual Site Prices:")
-        print_table(table_data)
+# Print the totals table
+totals_data = [("Site Name", "Total (£)")]
+for site_name, total in site_totals.items():
+    totals_data.append((site_name, "Total: £{:.2f}".format(total)))
 
-        # Print the totals table
-        totals_data = [("Site Name", "Total (£)")]
-        grand_total = 0
-        for site_name, total in site_totals.items():
-            totals_data.append((site_name, "£{:.2f}".format(total)))
-            grand_total += total
+print("\nTotals:")
+print_table(totals_data)
 
-        print("\nTotals Site Prices:")
-
-        print_table(totals_data)
-
-        # Calculate total
-        total = sum(float(num) for num in numbers)
-        print("Invoice Total:", "£" + str(total))
-
-        print("\n\n")
-
-        print("Totals:")
-        print_table(totals_data)
-        print("\nGrand Total: £{:.2f}".format(grand_total))
+# Calculate total
+total = sum(float(num) for num in numbers)
+print("Invoice Total:", "£" + str(total))
