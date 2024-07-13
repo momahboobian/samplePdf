@@ -1,7 +1,9 @@
 import re
 
 site_names = [
+    "Aldgate",
     "Birmingham",
+    "Bournemouth",
     "Canterbury",
     "Cardiff",
     "Chelmsford",
@@ -19,6 +21,7 @@ site_names = [
     "Southend",
     "Swindon",
     "The O2",
+    "Wandsworth",
     "Watford",
     "Gifting",
     "St Patricks Day",
