@@ -34,4 +34,4 @@ def check_upload_folder():
     return is_upload_folder_empty()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=8010)
