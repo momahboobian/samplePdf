@@ -10,6 +10,7 @@ UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
 
+
 def upload_file():
     if 'files[]' not in request.files:
         return jsonify({'error': 'No files uploaded'}), 400
@@ -18,7 +19,7 @@ def upload_file():
         return jsonify({'error': 'Upload folder is not empty. Do you want to empty it?'}), 409
 
     files = request.files.getlist('files[]')
-    
+
     for file in files:
         if file and file.filename.endswith('.pdf'):
             if not os.path.exists(UPLOAD_FOLDER):

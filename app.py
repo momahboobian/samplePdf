@@ -13,25 +13,31 @@ CORS(app)
 # Set up logging
 logging.basicConfig(level=LOG_LEVEL)
 
+
 @app.route('/')
 def index():
     return 'Backend is working!'
+
 
 @app.route('/upload', methods=['POST'])
 def handle_file_upload():
     return upload_file()
 
+
 @app.route('/totals')
 def process_pdf():
     return perform_action()
+
 
 @app.route('/empty', methods=['POST'])
 def empty_upload_folder_route():
     return empty_upload_folder()
 
+
 @app.route('/check-folder', methods=['GET'])
 def check_upload_folder():
     return is_upload_folder_empty()
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8010)
