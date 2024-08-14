@@ -3,8 +3,6 @@ import os
 import time
 import logging
 
-from utils.folder_utils import is_upload_folder_empty, empty_upload_folder
-
 UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
 
 # Set up logging
@@ -14,9 +12,6 @@ logging.basicConfig(level=logging.DEBUG)
 def upload_file():
     if 'files[]' not in request.files:
         return jsonify({'error': 'No files uploaded'}), 400
-
-    if not is_upload_folder_empty():
-        return jsonify({'error': 'Upload folder is not empty. Do you want to empty it?'}), 409
 
     files = request.files.getlist('files[]')
 
