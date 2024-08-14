@@ -45,7 +45,7 @@ def calculate_site_totals(pdf_folder):
             print(f"Total for Invoice: {invoice_number}: £{total:.2f}\n*****--------------******\n")
 
             site_totals[filename] = {
-                "invoice_number": invoice_number,
+                "invoice": invoice_number,
                 "site_totals": {site_name: f"{total_amount:.2f}" for site_name, total_amount in pdf_site_totals.items()},
                 "total": f"{total:.2f}",
             }
