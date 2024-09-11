@@ -2,8 +2,13 @@ from flask import jsonify, request
 import os
 import time
 import logging
+from .pdf_processing import calculate_site_totals, calculate_grand_totals
 
-UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
+# UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
+
+ # Create a timestamped folder for this upload session
+timestamp = time.strftime("%Y%m%d_%H%M%S")
+UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads', timestamp)
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
@@ -11,6 +16,10 @@ logging.basicConfig(level=logging.DEBUG)
 
 def upload_file(socketio):
     try:
+
+       
+
+        
         if 'files[]' not in request.files:
             return jsonify({'error': 'No files uploaded'}), 400
 
@@ -19,14 +28,13 @@ def upload_file(socketio):
         processed_files = 0
         grand_total = 0
 
-        for file in files:
-            if file and file.filename.endswith('.pdf'):
-                if not os.path.exists(UPLOAD_FOLDER):
+        if not os.path.exists(UPLOAD_FOLDER):
                     os.makedirs(UPLOAD_FOLDER)
 
-                timestamp = str(int(time.time()))
-                filename = f"{timestamp}_{file.filename}"
-                file_path = os.path.join(UPLOAD_FOLDER, filename)
+
+        for file in files:
+            if file and file.filename.endswith('.pdf'):
+                file_path = os.path.join(UPLOAD_FOLDER, file.filename)
                 file.save(file_path)
                 logging.info(f"File saved successfully at: {file_path}")
 
@@ -34,6 +42,7 @@ def upload_file(socketio):
                 grand_total += invoice_total
 
                 processed_files += 1
+
                 # Emit WebSocket event to the client
                 socketio.emit('invoice_processed', {
                     'file': file.filename,
@@ -53,9 +62,15 @@ def upload_file(socketio):
         return jsonify({'error': 'An internal server error occurred'}), 500
 
 
-def process_invoice(file_path):
-    # Mock implementation, replace with actual PDF processing logic
-    # Assume each invoice has a random total between 100 and 500
-    import random
-    invoice_total = random.randint(100, 500)
-    return invoice_total
+def process_invoice(file_path: str):
+    try:
+        # Extract and process invoice data using the actual logic
+        site_totals = calculate_site_totals(UPLOAD_FOLDER)
+        grand_totals = calculate_grand_totals(UPLOAD_FOLDER)
+        
+        # Assume the grand total is what you need to return
+        return float(grand_totals['total_of_grand_totals'])
+    
+    except Exception as e:
+        logging.error(f"Error processing invoice at {file_path}: {e}")
+        return 0.0  # Or handle according to your error management strategy
