@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_socketio import SocketIO
 from flask_cors import CORS
 import logging
 
@@ -9,6 +10,7 @@ from routes.folder_operations import is_upload_folder_empty, empty_upload_folder
 
 app = Flask(__name__)
 CORS(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Set up logging
 logging.basicConfig(level=LOG_LEVEL)
@@ -21,7 +23,7 @@ def index():
 
 @app.route('/api/upload', methods=['POST'])
 def handle_file_upload():
-    return upload_file()
+    return upload_file(socketio)
 
 
 @app.route('/api/totals')
@@ -40,4 +42,4 @@ def check_upload_folder():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    socketio.run(app, host='0.0.0.0')
