@@ -24,12 +24,12 @@ def index():
 
 @app.route('/api/upload', methods=['POST'])
 def handle_file_upload():
-    return upload_file(socketio)
+    return upload_file()
 
 
 @app.route('/api/totals')
 def process_pdf():
-    return perform_action()
+    return perform_action(socketio)
 
 
 @app.route('/api/empty', methods=['POST'])
