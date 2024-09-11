@@ -3,16 +3,17 @@ import os
 import time
 import logging
 
- # Create a timestamped folder each Upload Folder (correct this)
-timestamp = time.strftime("%Y%m%d_%H%M%S")
-UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads', timestamp)
-
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
 
-
 def upload_file():
     try:
+        folder_name = request.form.get('folder')
+        if not folder_name:
+            return jsonify({'error': 'Folder name is required'}), 400
+
+        UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads', folder_name)
+
         if 'files[]' not in request.files:
             return jsonify({'error': 'No files uploaded'}), 400
 
