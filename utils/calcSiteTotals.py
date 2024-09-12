@@ -58,7 +58,7 @@ def calculate_site_totals(pdf_folder, socketio=None):
 
             site_totals[filename] = {
                 "invoice": invoice_number,
-                "site_totals": dict(pdf_site_totals),
+                'sites_totals': dict(pdf_site_totals),
                 "total": total
             }
 
@@ -67,8 +67,9 @@ def calculate_site_totals(pdf_folder, socketio=None):
                 # Emit real-time progress
                 socketio.emit('invoice_processed', {
                     'file': filename,
-                    "invoice": invoice_number,
-                    'site_totals': {"site_totals": dict(pdf_site_totals),"total": total},
+                    'invoice': invoice_number,
+                    'site_totals': dict(pdf_site_totals),
+                    'total': total,
                     'progress': (processed_files / total_files) * 100
                 })
 
