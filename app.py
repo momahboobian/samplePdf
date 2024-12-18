@@ -10,8 +10,8 @@ from routes.folder_operations import is_upload_folder_empty, empty_upload_folder
 from utils.cleanup import scheduler 
 
 app = Flask(__name__)
-CORS(app, origin=["https://pdf-analysis.moreel.me/", "https://pdf-analysis.moreel.me/api"])
-# socketio = SocketIO(app, cors_allowed_origins=["https://pdf-analysis.moreel.me", "https://pdf-analysis.moreel.me/api","https://pdf-analysis.moreel.me/socket.io/", "http://localhost:3030"])
+CORS(app, origin=["https://pdf-analysis.moreel.me", "https://pdf-analysis.moreel.me/api"])
+origins = ["https://pdf-analysis.moreel.me", "https://pdf-analysis.moreel.me/api","https://pdf-analysis.moreel.me/socket.io", "http://localhost:3030"]
 socketio = SocketIO(app, cors_allowed_origins="*")
 # Set up logging
 logging.basicConfig(level=LOG_LEVEL)

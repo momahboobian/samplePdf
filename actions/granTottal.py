@@ -3,7 +3,8 @@ import re
 from PyPDF2 import PdfReader
 
 site_names = {
-    "Birmingham": "Birmingham",
+   "Birmingham": "Birmingham",
+    "Cambridge": "Cambridge",
     "Canterbury": "Canterbury",
     "Cardiff": "Cardiff",
     "Chelmsford": "Chelmsford",
@@ -11,6 +12,7 @@ site_names = {
     "Edinburgh": "Edinburgh",
     "Exeter": "Exeter",
     "Glasgow": "Glasgow",
+    "Ipswich": "Ipswich",
     "Lakeside": "Lakeside",
     "Leeds": "Leeds",
     "Liverpool": "Liverpool",
@@ -18,6 +20,7 @@ site_names = {
     "Norwich": "Norwich",
     "Oxford Street": "Oxford Street",
     "Plymouth": "Plymouth",
+    "Southhampton": "Southampton",
     "Southend": "Southend",
     "Swindon": "Swindon",
     "The O2": "The O2",
