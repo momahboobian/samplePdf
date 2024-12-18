@@ -2,6 +2,8 @@ from flask import Flask
 from flask_socketio import SocketIO
 from flask_cors import CORS
 import logging
+import os
+import sys
 
 from config import LOG_LEVEL
 from routes.file_upload import upload_file
@@ -43,5 +45,18 @@ def check_upload_folder():
 
 
 if __name__ == '__main__':
+    # Default port
+    port = 5000
+
+    # Check for port from command-line arguments
+    if len(sys.argv) > 1:
+        try:
+            port = int(sys.argv[sys.argv.index("--port") + 1])
+        except (ValueError, IndexError):
+            print("Invalid or missing port value. Using default port 5000.")
+
+    # Alternatively, get the port from the environment variable
+    port = int(os.getenv("PORT", port))  # Use PORT environment variable if set
+
     scheduler.start()
-    socketio.run(app, host='0.0.0.0')
+    socketio.run(app, host='0.0.0.0', port=port)
