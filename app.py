@@ -1,5 +1,5 @@
-from flask import Flask
 from flask_socketio import SocketIO
+from flask import Flask, request
 from flask_cors import CORS
 import logging
 import os
@@ -9,15 +9,37 @@ from config import LOG_LEVEL
 from routes.file_upload import upload_file
 from routes.pdf_processing import perform_action
 from routes.folder_operations import is_upload_folder_empty, empty_upload_folder
-from utils.cleanup import scheduler 
+from utils.cleanup import scheduler
+from db.populate_data import populate_data
 
 app = Flask(__name__)
 CORS(app, origin=["https://pdf-analysis.moreel.me", "https://pdf-analysis.moreel.me/api"])
 origins = ["https://pdf-analysis.moreel.me", "https://pdf-analysis.moreel.me/api","https://pdf-analysis.moreel.me/socket.io", "http://localhost:3030"]
 socketio = SocketIO(app, cors_allowed_origins="*")
+
 # Set up logging
 logging.basicConfig(level=LOG_LEVEL)
 
+# Socket Event: Start population
+@socketio.on('start_population')
+def handle_start_population(data):
+    """
+    Handle the data population process once the event is received from the client.
+    """
+    try:
+        batch_id = data['batch_id']
+        invoice_data = data['invoice_data']
+        site_data = data['site_data']
+        grand_totals = data['grand_totals']
+        
+        # Perform data population in the database
+        populate_data(batch_id, invoice_data, site_data, grand_totals)
+
+        # Emit a message when population is done
+        emit('population_complete', {'message': 'Data population complete'})
+        
+    except Exception as e:
+        emit('population_error', {'error': str(e)})
 
 @app.route('/api/')
 def index():
@@ -46,7 +68,7 @@ def check_upload_folder():
 
 if __name__ == '__main__':
     # Default port
-    port = 5000
+    port = 5001
 
     # Check for port from command-line arguments
     if len(sys.argv) > 1:
