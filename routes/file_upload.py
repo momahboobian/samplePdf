@@ -1,13 +1,16 @@
-from flask import jsonify, request
 import os
 import time
 import logging
+import uuid
+from flask import jsonify, request
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
 
 def upload_file():
     try:
+        batch_id = str(uuid.uuid4())
+
         folder_name = request.form.get('folder')
         if not folder_name:
             return jsonify({'error': 'Folder name is required'}), 400
@@ -18,14 +21,13 @@ def upload_file():
         files = request.files.getlist('files[]')
         total_files = len(files)
 
-        UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads', folder_name)
+        UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads', folder_name, batch_id)
 
         if not os.path.exists(UPLOAD_FOLDER):
             os.makedirs(UPLOAD_FOLDER)
 
         for file in files:
             if file and file.filename.endswith('.pdf'):
-                # Generate a unique timestamp for the filename
                 timestamp = str(int(time.time()))
                 filename = f"{timestamp}_{file.filename}"
                 file_path = os.path.join(UPLOAD_FOLDER, filename)
@@ -37,6 +39,7 @@ def upload_file():
         return jsonify({
             'message': 'Files uploaded successfully',
             'folder': folder_name,
+            'batch_id': batch_id,
             'total_files': total_files
         }), 200
 
