@@ -5,7 +5,7 @@ from utils.extractInvoice import extract_invoice_number
 from utils.extractSiteNames import extract_site_names
 from utils.printTable import print_table
 
-def calculate_site_totals(upload_folder, socketio=None):
+def calculate_site_totals(upload_folder, socketio):
     site_totals = defaultdict(lambda: defaultdict(float))
     total_files = len([f for f in os.listdir(upload_folder) if f.endswith('.pdf')])
     processed_files = 0

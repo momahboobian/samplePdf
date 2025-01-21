@@ -13,9 +13,9 @@ from utils.cleanup import scheduler
 # from db.populate_data import populate_data
 
 app = Flask(__name__)
-CORS(app, origin=["https://pdf-analysis.moreel.me", "https://pdf-analysis.moreel.me/api"])
-# CORS(app, resources={r"/api/*": {"origins": "*"}})
-origins = ["https://pdf-analysis.moreel.me", "https://pdf-analysis.moreel.me/api","https://pdf-analysis.moreel.me/socket.io", "http://localhost:3030"]
+# CORS(app, origin=["https://pdf-analysis.moreel.me", "https://pdf-analysis.moreel.me/api"])
+CORS(app, resources={r"/api/*": {"origins": "*"}})
+origins = ["https://pdf-analysis.moreel.me", "http://localhost:3030"]
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Set up logging
@@ -32,7 +32,7 @@ def index():
 
 @app.route('/api/upload', methods=['POST'])
 def handle_file_upload():
-    return upload_file()
+    return upload_file(socketio)
 
 
 @app.route('/api/totals')

@@ -9,7 +9,7 @@ from utils.calcSiteTotals import calculate_site_totals
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
 
-def upload_file():
+def upload_file(socketio):
     try:
         folder_name = request.form.get('folder')
         if not folder_name:
@@ -36,7 +36,7 @@ def upload_file():
                 logging.info(f"File saved successfully at: {file_path}")
 
                 # Call the calculate_site_totals function
-                calculate_site_totals(upload_folder)
+                calculate_site_totals(upload_folder, socketio)
                 logging.info("Site totals calculated successfully")
             else:
                 emit('file_upload_error', {
