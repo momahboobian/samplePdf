@@ -1,7 +1,7 @@
 import os
 from collections import defaultdict
 from utils.extractText import extract_text_from_pdf
-from utils.extractSiteNames import extract_site_names, site_names
+from utils.extractSiteNames import extract_site_names
 from utils.printTable import print_table
 
 
@@ -12,9 +12,9 @@ def calculate_grand_totals(pdf_folder):
         if filename.endswith(".pdf"):
             pdf_path = os.path.join(pdf_folder, filename)
             pdf_text = extract_text_from_pdf(pdf_path)
-            matched_site_names = extract_site_names(pdf_text, site_names)
+            matched_site_names = extract_site_names(pdf_text)
 
-            for site_name, number in matched_site_names:
+            for site_name, number in matche:
                 grand_totals[site_name] += float(number)
 
     # Print grand totals
