@@ -1,7 +1,9 @@
 import re
+import psycopg2
 from decimal import Decimal, ROUND_HALF_UP
+from config import DATABASE_URL
 
-site_names = [
+site_names_array = [
     "Aldgate",
     "Birmingham",
     "Brunch - 2024 – Conversion",
@@ -34,13 +36,23 @@ site_names = [
 ]
 
 
-def extract_site_names(text):
+
+def extract_site_names(pdf_text):
+    # Connect to the database
+    connection = psycopg2.connect(DATABASE_URL)
+    cursor = connection.cursor()
+    cursor.execute("SELECT name FROM sites")
+    site_names = [row[0] for row in cursor.fetchall()]
+    connection.close()
+
+    print(site_names)
+
     matched_site_names = {}
     total_amount = Decimal(0)
-    lines = text.split('\n')
+    lines = pdf_text.split('\n')
     for i, line in enumerate(lines):
         if "Boom_Facebook" in line:
-            site_name = next((site for site in site_names if site.lower() in line.lower()), None)
+            site_name = next((site for site in site_names_array if site.lower() in line.lower()), None)
             if site_name:
                 for j in range(i+1, len(lines)):
                     if "AM" in lines[j] or "PM" in lines[j]:
@@ -56,6 +68,6 @@ def extract_site_names(text):
     if "Leads" in matched_site_names:
         matched_site_names["Leeds"] = matched_site_names.get("Leeds", Decimal(0)) + matched_site_names["Leads"]
         del matched_site_names["Leads"]
-    print(matched_site_names)
-    print(f"Total Amount: {total_amount.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)}")
+    # print(matched_site_names)
+    # print(f"Total Amount: {total_amount.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)}")
     return matched_site_names
