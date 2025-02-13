@@ -34,6 +34,7 @@ def handle_connect():
 @socketio.on('disconnect')
 def handle_disconnect():
     print('Client disconnected')
+    logging.info("Client disconnected")
 
 @socketio.on_error_default
 def default_error_handler(error):
