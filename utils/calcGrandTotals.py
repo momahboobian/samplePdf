@@ -7,15 +7,18 @@ from utils.printTable import print_table
 
 def calculate_grand_totals(pdf_folder):
     grand_totals = defaultdict(float)
+    try:
+        for filename in os.listdir(pdf_folder):
+            if filename.endswith(".pdf"):
+                pdf_path = os.path.join(pdf_folder, filename)
+                try:
+                    pdf_text = extract_text_from_pdf(pdf_path)
+                    matched_site_names = extract_site_names(pdf_text)
 
-    for filename in os.listdir(pdf_folder):
-        if filename.endswith(".pdf"):
-            pdf_path = os.path.join(pdf_folder, filename)
-            pdf_text = extract_text_from_pdf(pdf_path)
-            matched_site_names = extract_site_names(pdf_text)
-
-            for site_name, number in matche:
-                grand_totals[site_name] += float(number)
+                    for site_name, number in matched_site_names.items():
+                        grand_totals[site_name] += float(number)
+                except Exception as e:
+                    print(f"Error processing file {filename}: {e}")
 
     # Print grand totals
     # print("Grand Totals:")
@@ -33,6 +36,8 @@ def calculate_grand_totals(pdf_folder):
     # print(f"Total of Grand Totals: £{total_grand_total:.2f}")
 
 
+    except Exception as e:
+         print(f"Error in calculate_grand_totals: {e}")
     formatted_grand_totals = {site_name: f"{amount:.2f}" for site_name, amount in grand_totals.items()}
     total_of_grand_totals = sum(grand_totals.values())
 
@@ -40,7 +45,5 @@ def calculate_grand_totals(pdf_folder):
         "grand_totals": formatted_grand_totals,
         "total_of_grand_totals": f"{total_of_grand_totals:.2f}"
     }
-
-
 
 

@@ -5,15 +5,16 @@ from waitress import serve
 import logging
 import os
 import sys
-
 from config import *
 from routes.file_upload import upload_file
 from routes.pdf_processing import perform_action
 from routes.folder_operations import is_upload_folder_empty, empty_upload_folder
 from utils.cleanup import scheduler
+from utils.cors_config import get_allowed_origins 
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": ["https://pdf-analysis.moreel.me"]}})
+origins = get_allowed_origins()
+CORS(app, resources={r"/api/*": {"origins": origins}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Set up logging
@@ -79,7 +80,7 @@ if __name__ == '__main__':
 
     scheduler.start()
 
-    if mode == "dev":
+    if mode == "local":
         socketio.run(app, host='0.0.0.0', port=port)
     else:
         serve(app, host='0.0.0.0', port=port, threads=4)

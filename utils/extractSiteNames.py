@@ -45,7 +45,7 @@ def extract_site_names(pdf_text):
     site_names = [row[0] for row in cursor.fetchall()]
     connection.close()
 
-    print(site_names)
+    # print(site_names)
 
     matched_site_names = {}
     total_amount = Decimal(0)
