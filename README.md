@@ -24,7 +24,7 @@ The backend is responsible for handling various functionalities, including user 
 1. Clone the repository:
 
 ```
-git clone https://github.com/your_username/flox-python-backend.git
+git clone https://github.com/momahboobian/samplePdf/
 ```
 
 2. Install dependencies:
