@@ -1,46 +1,47 @@
+from config import DATABASE_URL
 import psycopg2
 import sys
 import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import DATABASE_URL
-
 
 connection = psycopg2.connect(DATABASE_URL)
 cursor = connection.cursor()
 
+
 schema = """
 CREATE TABLE IF NOT EXISTS sites (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL UNIQUE
+    id SERIAL,
+    site_name VARCHAR(255) PRIMARY KEY,
+    UNIQUE (site_name)
 );
 
 CREATE TABLE IF NOT EXISTS invoices (
-    id SERIAL PRIMARY KEY,
-    batch_id TEXT NOT NULL,
-    filename TEXT NOT NULL,
-    payment_date TIMESTAMP,
-    transaction_id TEXT UNIQUE,
-    total NUMERIC
+    id SERIAL,
+    invoice_identifier VARCHAR PRIMARY KEY,
+    transaction_id VARCHAR,
+    batch_id VARCHAR NOT NULL,
+    processing_timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS site_totals (
-    id SERIAL PRIMARY KEY,
-    batch_id TEXT NOT NULL,
-    invoice_id INT REFERENCES invoices(id),
-    site_name TEXT NOT NULL,
-    total NUMERIC
+    id SERIAL,
+    invoice_identifier VARCHAR NOT NULL REFERENCES invoices(invoice_identifier) ON DELETE CASCADE,
+    site_name VARCHAR NOT NULL REFERENCES sites(site_name) ON DELETE CASCADE,
+    total_amount DECIMAL NOT NULL,
+    PRIMARY KEY (invoice_identifier, site_name)
 );
 
 CREATE TABLE IF NOT EXISTS grand_totals (
-    id SERIAL PRIMARY KEY,
-    batch_id TEXT NOT NULL,
-    site_name TEXT NOT NULL,
-    total NUMERIC,
-    total_of_grand_totals NUMERIC
+    id SERIAL,
+    batch_id VARCHAR PRIMARY KEY,
+    site_name VARCHAR NOT NULL REFERENCES sites(site_name) ON DELETE CASCADE,
+    grand_total_amount DECIMAL NOT NULL,
+    calculation_timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE (batch_id, site_name)
 );
 
-INSERT INTO sites (name)
+INSERT INTO sites (site_name)  -- Changed "name" to "site_name"
 VALUES
     ('Aldgate'),
     ('Birmingham'),
@@ -77,3 +78,5 @@ cursor.execute(schema)
 connection.commit()
 cursor.close()
 connection.close()
+
+print("Database schema created successfully.")

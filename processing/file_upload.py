@@ -3,7 +3,7 @@ import logging
 import uuid
 from flask import jsonify, request
 from utils.logger import setup_logger
-
+from processing.processing_workflow import process_all_pdfs
 
 # Set up logging
 setup_logger()
@@ -65,6 +65,10 @@ def upload_file(socketio):
         success_message = "Files uploaded successfully"
         logger.info(f"Batch {batch_id}: {success_message}")
         socketio.emit('all_invoices_processed', {'batch_id': batch_id})
+
+        #  Trigger PDF processing after successful upload
+        process_all_pdfs(upload_folder, socketio)
+
         return jsonify({'batch_id': batch_id, 'message': success_message}), 200
 
     except Exception as e:

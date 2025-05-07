@@ -1,10 +1,11 @@
 import os
 import time
 import pytest
-from app import app, socketio
+from apps import app, socketio
 from flask_socketio import SocketIOTestClient
 
 UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
+
 
 @pytest.fixture
 def setup_and_teardown():
@@ -15,12 +16,14 @@ def setup_and_teardown():
         if os.path.isfile(file_path):
             os.remove(file_path)
 
+
 def test_upload_and_process_files(client, socket_client, setup_and_teardown):
     # Upload a file
     data = {
         'files[]': (open('path/to/your/testfile.pdf', 'rb'), 'testfile.pdf')
     }
-    response = client.post('/api/upload', content_type='multipart/form-data', data=data)
+    response = client.post(
+        '/api/upload', content_type='multipart/form-data', data=data)
     assert response.status_code == 200
     assert b'Files uploaded successfully' in response.data
 
@@ -35,6 +38,7 @@ def test_upload_and_process_files(client, socket_client, setup_and_teardown):
         def handle_invoice_processed(data):
             assert 'file' in data
             assert 'total' in data
+
         @client.on('processing_complete')
         def handle_processing_complete(data):
             assert 'grand_total' in data

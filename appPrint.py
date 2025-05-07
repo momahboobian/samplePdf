@@ -1,8 +1,7 @@
 import os
 
-from utils.calcSiteTotals import calculate_site_totals
-from utils.calcGrandTotals import calculate_grand_totals
-
+from utilsssss.calcSiteTotals import calculate_site_totals
+from utilsssss.calcGrandTotals import calculate_grand_totals
 
 
 # Get the directory of the current script
